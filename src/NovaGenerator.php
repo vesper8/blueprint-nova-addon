@@ -77,7 +77,7 @@ class NovaGenerator implements Generator
         
 
         $stub = str_replace('DummyNamespace', $resourceNamespace, $stub);  
-        $stub = str_replace('id', $model->primareKey(), $stub);
+        $stub = str_replace('id', $model->primaryKey(), $stub);
         $stub = str_replace('DummyClass', $model->name(), $stub);
         $stub = str_replace('DummyModel', '\\'.$model->fullyQualifiedClassName(), $stub);
         $stub = str_replace('// fields...', $data['fields'], $stub);
