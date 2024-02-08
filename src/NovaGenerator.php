@@ -76,10 +76,11 @@ class NovaGenerator implements Generator
             ->thenReturn();
 
         $stub = str_replace('DummyNamespace', $resourceNamespace, $stub);
+        $stub = str_replace('id', $model->primaryKey(), $stub);
         $stub = str_replace('DummyClass', $model->name(), $stub);
         $stub = str_replace('DummyModel', '\\'.$model->fullyQualifiedClassName(), $stub);
         $stub = str_replace('// fields...', $data['fields'], $stub);
-        $stub = str_replace('use Illuminate\Http\Request;', implode(PHP_EOL, $data['imports']), $stub);
+        $stub = str_replace('use Laravel\Nova\Http\Requests\NovaRequest;', implode(PHP_EOL, $data['imports']), $stub);
 
         return $stub;
     }
@@ -92,8 +93,8 @@ class NovaGenerator implements Generator
      * Model's Resource.
      * @example For a model with FQCN `App\Models\Assets\Video`, with Blueprint configured for Laravel 8, you'd call `getNovaNamespaceFor('resource', 'Assets\Video')
      *
-     * @param string $type Nova component type, lowercase (e.g. resource, lens, action)
-     * @param string $localClassName see examples.
+     * @param  string  $type  Nova component type, lowercase (e.g. resource, lens, action)
+     * @param  string  $localClassName  see examples.
      * @return string FQCN to the $componentType's class namespace.
      */
     protected function getFullyQualifiedClassNameForComponent(string $type, string $localClassName): string
@@ -108,13 +109,10 @@ class NovaGenerator implements Generator
 
     /**
      * Returns the fully qualified class name of the Nova resource for this model.
-     *
-     * @param Model $model
-     * @return string
      */
     protected function getNovaResourceClassName(Model $model): string
     {
-        $afterSelector = config("blueprint.models_namespace") ?: config('blueprint.namespace');
+        $afterSelector = config('blueprint.models_namespace') ?: config('blueprint.namespace');
         $modelBaseClass = Str::after($model->fullyQualifiedClassName(), $afterSelector);
 
         return $this->getFullyQualifiedClassNameForComponent('resource', $modelBaseClass);
@@ -147,9 +145,8 @@ class NovaGenerator implements Generator
 
         $additionalTasks = [
             new AddResourceImportIfRequired($this->getFullyQualifiedClassNameForComponent('resource', 'Resource')),
-            new RemapImports
+            new RemapImports,
         ];
-
 
         return array_merge($tasks, $additionalTasks);
     }

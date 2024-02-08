@@ -18,9 +18,9 @@ class RemapImports implements Task
 
                 return 'use Laravel\Nova\Fields\\'.$import.';';
             })
-            ->prepend('use Illuminate\Http\Request;')
+            ->prepend('use Laravel\Nova\Http\Requests\NovaRequest;')
             ->sort(function ($a, $b) {
-                return  strlen($a) - strlen($b) ?: strcmp($a, $b);
+                return strlen($a) - strlen($b) ?: strcmp($a, $b);
             })
             ->values()
             ->all();
