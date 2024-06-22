@@ -15,8 +15,6 @@ use Naoray\BlueprintNovaAddon\Tasks\RemapImports;
 
 class NovaGenerator implements Generator
 {
-    use HasStubPath;
-
     /** @var \Illuminate\Contracts\Filesystem\Filesystem */
     private $files;
 
@@ -35,7 +33,11 @@ class NovaGenerator implements Generator
     {
         $output = [];
 
-        $stub = $this->files->get($this->stubPath().DIRECTORY_SEPARATOR.'class.stub');
+        if(config('nova_blueprint.stub_path')) {
+            $stub = $this->files->get(base_path(config('nova_blueprint.stub_path')));
+        } else {
+            $stub = $this->files->get(dirname(__DIR__).'/stubs'.DIRECTORY_SEPARATOR.'class.stub');
+        }
 
         /** @var \Blueprint\Models\Model $model */
         foreach ($tree->models() as $model) {
@@ -145,7 +147,7 @@ class NovaGenerator implements Generator
 
         $additionalTasks = [
             new AddResourceImportIfRequired($this->getFullyQualifiedClassNameForComponent('resource', 'Resource')),
-            new RemapImports,
+            new RemapImports(),
         ];
 
         return array_merge($tasks, $additionalTasks);
